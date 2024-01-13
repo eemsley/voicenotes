@@ -1,16 +1,16 @@
 import { router, publicProcedure, protectedProcedure } from "../trpc";
 import { z } from "zod";
 
-export const postRouter = router({
+export const noteRouter = router({
   all: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.post.findMany();
+    return ctx.prisma.note.findMany();
   }),
   byId: publicProcedure.input(z.string()).query(({ ctx, input }) => {
-    return ctx.prisma.post.findFirst({ where: { id: input } });
+    return ctx.prisma.note.findFirst({ where: { id: input } });
   }),
   create: protectedProcedure
     .input(z.object({ title: z.string(), content: z.string() }))
     .mutation(({ ctx, input }) => {
-      return ctx.prisma.post.create({ data: input });
+      return ctx.prisma.note.create({ data: input });
     }),
 });

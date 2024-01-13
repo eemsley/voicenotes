@@ -10,8 +10,16 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id      String @id @default(cuid())
-    title   String
-    content String
+model Note {
+    id       String @id @default(cuid())
+    title    String
+    content  String
+    authorId String
+    author   User   @relation(fields: [authorId], references: [clerkId])
+}
+
+model User {
+    clerkId  String @id
+    username String @unique
+    Note     Note[]
 }
