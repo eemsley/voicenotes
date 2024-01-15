@@ -11,7 +11,7 @@ const SignOutWIthOauth = () => {
   return (
     <Pressable
       onPress={() => signOut()}
-      className="bg-primary-500 w-full rounded-lg border border-neutral-100 p-4"
+      className="bg-primary-500 rounded-lg border border-neutral-100 p-4"
     >
       <Text className="text-center text-neutral-100">Sign Out</Text>
     </Pressable>
