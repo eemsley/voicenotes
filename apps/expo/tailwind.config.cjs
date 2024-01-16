@@ -5,7 +5,7 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     colors: {
-      primary: colors.indigo,
+      primary: colors.orange,
       neutral: colors.slate,
       transparent: "transparent",
       black: colors.black,

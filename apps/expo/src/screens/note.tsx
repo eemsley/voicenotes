@@ -1,8 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import { View, TextInput, TouchableOpacity, SafeAreaView } from "react-native";
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  SafeAreaView,
+  ActivityIndicator,
+} from "react-native";
 import { trpc } from "../utils/trpc";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "@clerk/clerk-expo";
 
 export const ViewNoteScreen = ({
   navigation,
@@ -13,15 +20,18 @@ export const ViewNoteScreen = ({
 }) => {
   const params = route.params;
   const utils = trpc.useContext();
+  const { userId } = useAuth();
 
   const [content, setContent] = React.useState(params.note.content);
   const [title, setTitle] = React.useState(params.note.title);
 
-  const { mutate: updateNote } = trpc.note.update.useMutation({
-    async onSuccess() {
-      await utils.note.all.invalidate();
-    },
-  });
+  const { mutate: updateNote, isLoading: isUpdating } =
+    trpc.note.update.useMutation({
+      async onSettled() {
+        await utils.note.byUserId.invalidate(userId as string);
+        navigation.pop();
+      },
+    });
 
   const saveNote = () => {
     if (title != params.note.title && content != params.note.content) {
@@ -30,20 +40,20 @@ export const ViewNoteScreen = ({
         title: title || "",
         content: content || "",
       });
-    }
-    if (title != params.note.title && content == params.note.content) {
+    } else if (title != params.note.title && content == params.note.content) {
       updateNote({
         id: params.note.id,
         title: title || "",
         content: params.note.content || "",
       });
-    }
-    if (title == params.note.title && content != params.note.content) {
+    } else if (title == params.note.title && content != params.note.content) {
       updateNote({
         id: params.note.id,
         title: params.note.title || "",
         content: content || "",
       });
+    } else {
+      navigation.pop();
     }
   };
 
@@ -55,14 +65,21 @@ export const ViewNoteScreen = ({
             className="absolute left-0 top-3"
             onPress={() => {
               saveNote();
-              navigation.navigate("Home");
             }}
           >
-            <Ionicons name="chevron-back" size={32} color="black" />
+            {isUpdating ? (
+              <ActivityIndicator
+                size="small"
+                color="black"
+                style={{ paddingLeft: 10, paddingTop: 4 }}
+              />
+            ) : (
+              <Ionicons name="chevron-back" size={32} color="black" />
+            )}
           </TouchableOpacity>
           <TextInput
             multiline={true}
-            className="text-primary-500 truncate rounded-lg bg-transparent py-2 px-6 text-2xl font-bold"
+            className="text-primary-500 ml-8 truncate rounded-lg py-2 pr-8 text-2xl font-bold"
             placeholder={"Title"}
             value={title}
             defaultValue={title}

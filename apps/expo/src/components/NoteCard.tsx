@@ -20,6 +20,7 @@ const NoteCard: React.FC<{
   });
   const [disabled, setDisabled] = React.useState(false);
   const handleDelete = () => {
+    setDisabled(true);
     Alert.alert("Delete Note", "Are you sure you want to delete this note?", [
       {
         text: "Cancel",
@@ -43,23 +44,23 @@ const NoteCard: React.FC<{
         navigation.navigate("Note", { note: note });
       }}
       disabled={disabled}
-      className="border-primary-400 flex h-16 w-full flex-row rounded-lg border bg-neutral-100 px-2 pt-2 pb-1"
+      className="border-primary-400 flex h-16 w-[100%] flex-row rounded-lg border bg-neutral-100 px-2 pt-2 pb-1"
     >
-      {disabled ? (
-        <View className="h-full w-full items-center justify-center">
-          <ActivityIndicator size="small" color="black" />
-        </View>
-      ) : (
-        <View className="flex h-full w-full">
-          <View className="flex h-1/2 w-full flex-row ">
-            <Text
-              numberOfLines={1}
-              ellipsizeMode="tail"
-              className="text-primary-500 w-[90%] text-xl font-bold"
-            >
-              {note.title}
-            </Text>
-            <Pressable className="absolute right-0">
+      <View className="flex h-full w-full">
+        <View className="flex h-1/2 w-full flex-row ">
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            className="text-primary-500 w-[90%] text-xl font-bold"
+          >
+            {note.title}
+          </Text>
+          {disabled ? (
+            <View className="absolute right-0 h-5 w-5 items-center justify-center">
+              <ActivityIndicator size={"small"} />
+            </View>
+          ) : (
+            <Pressable className="absolute right-0 h-5 w-5 items-center justify-center">
               <Ionicons
                 name="close"
                 size={16}
@@ -67,25 +68,25 @@ const NoteCard: React.FC<{
                 onPress={handleDelete}
               />
             </Pressable>
-          </View>
-
-          <View className="flex h-1/2 w-full flex-row items-center ">
-            <Text
-              numberOfLines={1}
-              ellipsizeMode="tail"
-              className="w-1/2 text-xs text-neutral-800"
-            >
-              {note.content}
-            </Text>
-            <Text
-              className="absolute right-0 bottom-0 text-neutral-800"
-              style={{ fontSize: 10 }}
-            >
-              <TimeAgo time={note.updatedAt} hideAgo={false} />
-            </Text>
-          </View>
+          )}
         </View>
-      )}
+
+        <View className="flex h-1/2 w-full flex-row items-center ">
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            className="w-1/2 text-xs text-neutral-800"
+          >
+            {note.content}
+          </Text>
+          <Text
+            className="absolute right-0 bottom-0 text-neutral-800"
+            style={{ fontSize: 10 }}
+          >
+            <TimeAgo time={note.updatedAt} hideAgo={false} />
+          </Text>
+        </View>
+      </View>
     </Pressable>
   );
 };
