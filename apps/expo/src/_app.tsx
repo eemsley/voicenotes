@@ -11,6 +11,11 @@ import Constants from "expo-constants";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { ViewNoteScreen } from "./screens/note";
+import { LogBox } from "react-native";
+
+LogBox.ignoreLogs([
+  "Non-serializable values were found in the navigation state",
+]);
 
 export const App = () => {
   const Stack = createStackNavigator();

@@ -1,14 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import {
-  Text,
-  View,
-  TextInput,
-  TouchableOpacity,
-  SafeAreaView,
-  Pressable,
-} from "react-native";
+import { View, TextInput, TouchableOpacity, SafeAreaView } from "react-native";
 import { trpc } from "../utils/trpc";
-import { useAuth } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 
 export const ViewNoteScreen = ({
@@ -20,47 +13,36 @@ export const ViewNoteScreen = ({
 }) => {
   const params = route.params;
   const utils = trpc.useContext();
-  const note = trpc.note.byId.useQuery(params.noteId, {
-    onSettled: () => {
-      if (note && note.data) {
-        setContent(note.data.content);
-        setTitle(note.data.title);
-      }
-    },
-  });
+
+  const [content, setContent] = React.useState(params.note.content);
+  const [title, setTitle] = React.useState(params.note.title);
+
   const { mutate: updateNote } = trpc.note.update.useMutation({
     async onSuccess() {
       await utils.note.all.invalidate();
     },
   });
 
-  const [content, setContent] = React.useState("");
-
-  const [title, setTitle] = React.useState("");
-  const [textcount, setTextCount] = React.useState(0);
-
-  const handleContentChange = (text: string) => {
-    setContent(text);
-    setTextCount(textcount + 1);
-    console.log(textcount);
-    if (textcount % 10 == 0) {
+  const saveNote = () => {
+    if (title != params.note.title && content != params.note.content) {
       updateNote({
-        id: params.noteId,
-        title: title,
-        content: content,
+        id: params.note.id,
+        title: title || "",
+        content: content || "",
       });
     }
-  };
-  const handleTitleChange = (text: string) => {
-    setTitle(text);
-    setTextCount(textcount + 1);
-    console.log(textcount);
-
-    if (textcount % 10 == 0) {
+    if (title != params.note.title && content == params.note.content) {
       updateNote({
-        id: params.noteId,
-        title: title,
-        content: content,
+        id: params.note.id,
+        title: title || "",
+        content: params.note.content || "",
+      });
+    }
+    if (title == params.note.title && content != params.note.content) {
+      updateNote({
+        id: params.note.id,
+        title: params.note.title || "",
+        content: content || "",
       });
     }
   };
@@ -72,17 +54,21 @@ export const ViewNoteScreen = ({
           <TouchableOpacity
             className="absolute left-0 top-3"
             onPress={() => {
+              saveNote();
               navigation.navigate("Home");
             }}
           >
             <Ionicons name="chevron-back" size={32} color="black" />
           </TouchableOpacity>
           <TextInput
+            multiline={true}
             className="text-primary-500 truncate rounded-lg bg-transparent py-2 px-6 text-2xl font-bold"
             placeholder={"Title"}
             value={title}
             defaultValue={title}
-            onChangeText={(text) => handleTitleChange(text)}
+            onChangeText={(text) => {
+              setTitle(text);
+            }}
           />
         </View>
 
@@ -92,7 +78,9 @@ export const ViewNoteScreen = ({
           placeholder={"Content"}
           value={content}
           defaultValue={content}
-          onChangeText={(text) => handleContentChange(text)}
+          onChangeText={(text) => {
+            setContent(text);
+          }}
         />
       </View>
     </SafeAreaView>

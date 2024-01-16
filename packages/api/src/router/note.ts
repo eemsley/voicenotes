@@ -8,6 +8,9 @@ export const noteRouter = router({
   byId: publicProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.prisma.note.findFirst({ where: { id: input } });
   }),
+  byUserId: publicProcedure.input(z.string()).query(({ ctx, input }) => {
+    return ctx.prisma.note.findMany({ where: { authorId: input } });
+  }),
   create: protectedProcedure
     .input(
       z.object({
